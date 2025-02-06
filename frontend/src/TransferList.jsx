@@ -1,12 +1,5 @@
-import * as React from 'react';
-import Grid from '@mui/material/Grid';
-import List from '@mui/material/List';
-import ListItemButton from '@mui/material/ListItemButton';
-import ListItemIcon from '@mui/material/ListItemIcon';
-import ListItemText from '@mui/material/ListItemText';
-import Checkbox from '@mui/material/Checkbox';
-import Button from '@mui/material/Button';
-import Paper from '@mui/material/Paper';
+import * as React from "react";
+import { Paper, List, ListItemButton, ListItemIcon, ListItemText, Checkbox, Button, Grid, Typography } from "@mui/material";
 
 function not(a, b) {
     return a.filter((value) => !b.includes(value));
@@ -20,6 +13,12 @@ export default function TransferList({ leftUsers, rightUsers }) {
     const [checked, setChecked] = React.useState([]);
     const [left, setLeft] = React.useState(leftUsers);
     const [right, setRight] = React.useState(rightUsers);
+
+    // Ensure state updates when props change
+    React.useEffect(() => {
+        setLeft(leftUsers);
+        setRight(rightUsers);
+    }, [leftUsers, rightUsers]);
 
     const leftChecked = intersection(checked, left);
     const rightChecked = intersection(checked, right);
@@ -59,29 +58,28 @@ export default function TransferList({ leftUsers, rightUsers }) {
         setRight([]);
     };
 
-    const customList = (items) => (
-        <Paper sx={{ width: "32vw", height: "64vh", overflow: 'auto', marginTop: "16vh" }}>
+    const customList = (items, title) => (
+        <Paper sx={{ width: "24vw", height: "64vh", overflow: "auto" }}>
+            <Typography variant="h6" sx={{ p: 2, textAlign: "center", fontWeight: "bold" }}>
+                {title}
+            </Typography>
             <List dense component="div" role="list">
                 {items.map((value) => {
-                    const labelId = `transfer-list-item-${value}-label`;
+                    const labelId = `transfer-list-item-${value.id}-label`;
 
                     return (
-                        <ListItemButton
-                            key={value.id}
-                            role="listitem"
-                            onClick={handleToggle(value)}
-                        >
+                        <ListItemButton key={value.id} role="listitem" onClick={handleToggle(value)}>
                             <ListItemIcon>
                                 <Checkbox
                                     checked={checked.includes(value)}
                                     tabIndex={-1}
                                     disableRipple
                                     inputProps={{
-                                        'aria-labelledby': labelId,
+                                        "aria-labelledby": labelId,
                                     }}
                                 />
                             </ListItemIcon>
-                            <ListItemText id={labelId} primary={`${value.name}`} />
+                            <ListItemText id={labelId} primary={value.name} />
                         </ListItemButton>
                     );
                 })}
@@ -90,17 +88,14 @@ export default function TransferList({ leftUsers, rightUsers }) {
     );
 
     return (
-        <Grid
-            container
-            spacing={2}
-            sx={{ justifyContent: 'center', alignItems: 'center' }}
-        >
-            <Grid item>{customList(left)}</Grid>
+        <Grid container spacing={2} sx={{ justifyContent: "center", alignItems: "center" }}>
+            <Grid item>{customList(left, "Available Users")}</Grid>
+
             <Grid item>
-                <Grid container direction="column" sx={{ alignItems: 'center' }}>
+                <Grid container direction="column" sx={{ alignItems: "center", justifyContent: "center" }}>
                     <Button
-                        sx={{ my: 0.5 }}
-                        variant="outlined"
+                        sx={{ my: 1 }}
+                        variant="contained"
                         size="small"
                         onClick={handleAllRight}
                         disabled={left.length === 0}
@@ -109,8 +104,8 @@ export default function TransferList({ leftUsers, rightUsers }) {
                         ≫
                     </Button>
                     <Button
-                        sx={{ my: 0.5 }}
-                        variant="outlined"
+                        sx={{ my: 1 }}
+                        variant="contained"
                         size="small"
                         onClick={handleCheckedRight}
                         disabled={leftChecked.length === 0}
@@ -119,8 +114,8 @@ export default function TransferList({ leftUsers, rightUsers }) {
                         &gt;
                     </Button>
                     <Button
-                        sx={{ my: 0.5 }}
-                        variant="outlined"
+                        sx={{ my: 1 }}
+                        variant="contained"
                         size="small"
                         onClick={handleCheckedLeft}
                         disabled={rightChecked.length === 0}
@@ -129,8 +124,8 @@ export default function TransferList({ leftUsers, rightUsers }) {
                         &lt;
                     </Button>
                     <Button
-                        sx={{ my: 0.5 }}
-                        variant="outlined"
+                        sx={{ my: 1 }}
+                        variant="contained"
                         size="small"
                         onClick={handleAllLeft}
                         disabled={right.length === 0}
@@ -140,7 +135,8 @@ export default function TransferList({ leftUsers, rightUsers }) {
                     </Button>
                 </Grid>
             </Grid>
-            <Grid item>{customList(right)}</Grid>
+
+            <Grid item>{customList(right, "Selected Users")}</Grid>
         </Grid>
     );
 }
